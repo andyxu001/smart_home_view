@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!--<script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.24/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.7/dayjs.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.8.3.js"></script>
+    <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>-->
+
+   <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css">
+    <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>-->
+
+    <link href="/css/jquery.datetimepicker.min.css" rel="stylesheet" type="text/css">
+    <script src="/js/jquery-1.8.3.min.js"></script>
+    <script src="/js/jquery.datetimepicker.full.min.js"></script>
+
+    <script type="text/javascript" src="/js/ajaxFileupload.js"></script>
+    <script type="text/javascript" src="/js/jquery.html5uploader.js"></script>
+
+
+    <style type="text/css">
+        .contain{
+            border: 1px #dddddd solid;
+            width: 60%;
+            background-color: #FFFFFF;
+            margin: 50px 100px;
+        }
+
+        .contain table{
+            padding: 10px;
+        }
+
+        .contain table{
+            padding: 10px;
+        }
+
+        .td-title{
+            text-align: right;
+        }
+
+        input,select{
+            border-radius: 8px;
+            border: 1px solid #00BFFF;
+        }
+
+    </style>
+
+    <script type="text/javascript">
+        $(function(){
+            $.datetimepicker.setLocale('zh');
+            $('#beginDate').datetimepicker({
+                timepicker: false,
+                format: 'Y-m-d'
+            });
+            $('#endDate').datetimepicker({
+                timepicker: false,
+                format: 'Y-m-d'
+            });
+        });
+
+        function fileUpload(){
+                $.ajaxFileUpload({
+                    url:"/product/uploadFile.do",
+                    type:"POST",
+                    fileElementId:'avatar',
+                    contentType:"application/json",
+                    dataType:"json",
+                    success:function(data,status){
+                        $('#avatarId').val(data);
+                    },
+                    error:function (e) {
+                      alert(e);
+                    }
+                });
+        }
+
+        function update(){
+            var data = {
+                "id":$('#proId').val(),
+                "name":$('#proName').val(),
+                "quantity":$('#quantity').val(),
+                "unit":$('#unitType').val(),
+                "type":$('#proType').val(),
+                "productivityDate":$('#beginDate').val(),
+                "expireDate":$('#endDate').val(),
+                "fileId":$('#avatarId').val()
+            };
+            if($('#proName').val() == '') {
+                alert('请输入名称.');
+                return false;
+            }
+            if($('#quantity').val() == '') {
+                alert('请输入数量.');
+                return false;
+            }
+            if($('#unitType').val() == '') {
+                alert('请输入单位.');
+                return false;
+            }
+            if($('#proType').val() == '') {
+                alert('请输入类型.');
+                return false;
+            }
+            if($('#beginDate').val() == '') {
+                alert('请输入有效起始日期.');
+                return false;
+            }
+            if($('#endDate').val() == '') {
+                alert('请输入有效起始截至.');
+                return false;
+            }
+            $.ajax({
+                url:"/product/productUpdate.do",
+                type:"POST",
+                data:JSON.stringify(data),
+                contentType:"application/json",
+                dataType:"json",
+                success:function(data){
+                    alert('更新成功');
+                    location.href="/product/product.do";
+               },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log(textStatus, errorThrown);
+                }
+            });
+        }
+
+    </script>
+</head>
+<body>
+<div>
+    <img src="/icon/navigation.png" style="width: 16px;height: 16px" title="导航">
+    <a href="/product/product.do" target="content_frame" style="text-decoration: none">物品查询</a>
+    ><a href="/product/productAddShow.do" target="content_frame" style="text-decoration: none">物品更新</a>
+</div>
+<div class="contain">
+    <form enctype="multipart/form-data">
+        <input type="hidden" th:value="${productVo.id}" name="id" id="proId">
+        <table>
+            <tr>
+                <td colspan="3" style="text-align: center">
+                    <h2>更新物品</h2>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 20%" class="td-title">名称<span style="color: #FF0000;font-weight: bold">*</span>:</td>
+                <td style="width: 30%">
+                    <input type="text" name="proName" id="proName" th:value="${productVo.name}"/>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="td-title">数量<span style="color: #FF0000;font-weight: bold">*</span>:</td>
+                <td>
+                    <input type="number" name="quantity" id="quantity" value="" placeholder="请输入数量" th:value="${productVo.quantity}" style="width: 100%">
+                </td>
+                <td>
+                    <select name="unitType" style="width: 100%" id="unitType">
+                        <option value="">--请选择--</option>
+                        <option th:selected="${productVo.unit == p.code}" th:each="p:${unitTypes}" th:value="${p.code}" th:text="${p.name}"></option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="td-title">类型<span style="color: #FF0000;font-weight: bold">*</span>:</td>
+                <td colspan="2">
+                    <select name="proType" style="width: 100%" id="proType">
+                        <option value="">--请选择--</option>
+                        <option th:value="${p.code}" th:selected="${productVo.type == p.code}" th:each="p:${productTypes}"  th:text="${p.name}"></option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="td-title">有效期<span style="color: #FF0000;font-weight: bold">*</span>:</td>
+                <td colspan="2">
+                    <input type="text" name="beginDate" id="beginDate"  readonly="readonly" th:value="${productVo.productivityDate}">
+                    ~
+                    <input type="text" name="endDate" id="endDate"  readonly="readonly" th:value="${productVo.expireDate}">
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="3" style="text-align: center">
+                    <input type="button" value="提交" onclick="update()">
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+
+</body>
+</html>

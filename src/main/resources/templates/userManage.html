@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.24/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.7/dayjs.min.js"></script>
+
+    <script type="text/javascript">
+        function search(){
+            location.href="/user/userManage.do";
+        }
+    </script>
+</head>
+<body>
+该网站主要本人记录家庭物品的有效时间，并在过期前3天微信推送提醒.
+<br>
+<br>
+<br>
+<br>
+<b style="color: #b81900">备注: 该网站建设还在构思中......</b>
+
+  <div style="display: none">
+  <form id="form" action="">
+     账号: <input type="text" v-model.trim="info.account" placeholder="请输入账号"><br><br>
+     密码: <input type="password" v-model="info.password" placeholder="请输入密码"><br><br>
+     年龄: <input type="number" v-model.number="info.age" placeholder="请输入年龄"><br><br>
+     性别:男<input type="radio" name="sex" v-model="info.sex" value="男">
+           女<input type="radio" name="sex" v-model="info.sex" value="女"><br><br>
+      兴趣爱好:游泳<input type="checkbox" v-model="info.hobby" value="游泳">
+      看书<input type="checkbox" v-model="info.hobby" value="看书">
+      打球<input type="checkbox" v-model="info.hobby" value="打球">
+      游戏<input type="checkbox" v-model="info.hobby" value="游戏"><br><br>
+      城市:<select v-model="info.city">
+             <option>---请选择---</option>
+             <option value="beijing">北京</option>
+             <option value="hangzhou">杭州</option>
+             <option value="shanghai">上海</option>
+           </select><br><br>
+      备注:<textarea v-model.lazy="info.remark"></textarea>
+     <button @click="submit">提交</button>
+      <br>
+      <br>
+      <br>
+      <br>
+      当前时间:{{fmtTime}}
+  </form>
+  </div>
+</body>
+
+<script type="text/javascript">
+    Vue.config.productionTip=false;
+    const vue =new Vue({
+        el:'#form',
+        data:{
+            time:1621561377603,
+            info:{
+                account:'12',
+                password:'',
+                age:0,
+                sex:'',
+                city:'beijing',
+                hobby:[],
+                remark:''
+            }
+        },
+        methods:{
+            submit(){
+                console.log(JSON.stringify(this.info));
+                console.log(dayjs(this.time).format('YYYY年MM月DD日 HH:mm:ss'))
+            }
+        },
+        computed:{
+            fmtTime(){
+                return dayjs().format('YYYY-MM-DD HH:mm:ss');
+            }
+        }
+    });
+ console.log(vue);
+</script>
+</html>

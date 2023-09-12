@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.andy.home.mapper.ProductMapper">
+
+     <resultMap id="productMap" type="com.andy.home.po.Product">
+         <id property="id" column="id" />
+         <result property="userId" column="user_id"/>
+         <result property="name" column="product_name" />
+         <result property="quantity" column="quantity"/>
+         <result property="unit" column="unit"/>
+         <result property="type" column="type"/>
+         <result property="productivityDate"  column="productivity_date" />
+         <result property="expireDate"  column="expire_date" />
+         <result property="fileId"  column="file_id" />
+         <result property="isProcess"  column="is_process" />
+         <result property="orderBy" column="order_by"/>
+     </resultMap>
+
+    <insert id="addProduct" parameterType="product">
+      insert into product(user_id,code,product_name,status,type,quantity,unit,productivity_date,expire_date,file_id,is_process,order_by)
+      values(#{userId},#{code},#{name},#{status},#{type},#{quantity},#{unit},#{productivityDate,jdbcType=DATE},#{expireDate,jdbcType=DATE},#{fileId},#{isProcess},#{orderBy})
+    </insert>
+
+    <update id="delProduct" parameterType="integer">
+        update product set status = #{status} where id = #{id}
+    </update>
+
+    <update id="processProduct" parameterType="integer">
+        update product set is_process = #{status} where id = #{id}
+    </update>
+
+    <update id="productUpdate" parameterType="com.andy.home.po.Product">
+        update product set
+        product_name = #{name},
+        quantity = #{quantity},
+        unit = #{unit},
+        type = #{type},
+        productivity_date = #{productivityDate},
+        expire_date = #{expireDate}
+        where id = #{id}
+    </update>
+
+    <select id="queryAllProduct" resultType="com.andy.home.po.vo.ProductVo"
+            parameterType="com.andy.home.po.dto.ProductDto">
+        select
+           a.id as id,
+           a.code as code,
+           a.product_name as name,
+           a.`status` as status,
+           a.quantity as quantity,
+           a.productivity_date as productivityDate,
+           a.expire_date as expireDate,
+           b.`name` as typeName,
+           c.`name` as unitName,
+           DATEDIFF(a.expire_date,NOW()) as diffDay,
+           a.is_process as isProcess
+          from product a
+          left join data_dictionary b on a.type = b.code
+          left join data_dictionary c on a.unit = c.code
+        where
+        a.status = 0
+        and a.user_id = #{userId}
+        <if test="name != null and name.length() > 0">
+            and a.product_name like '%${name}%'
+        </if>
+
+        <!--正常的，还没有过期 -->
+        <if test="status != null">
+            <if test="status == 0">
+                and DATEDIFF(a.expire_date,NOW()) >= 0
+            </if>
+            <if test="status != 0">
+                and DATEDIFF(a.expire_date,NOW()) &lt; 0
+            </if>
+        </if>
+
+        <!--距过期剩余天数 -->
+        <if test="diffDay != null">
+            and DATEDIFF(a.expire_date,NOW()) >= 0
+            and DATEDIFF(a.expire_date,NOW()) &lt;= #{diffDay}
+        </if>
+
+        <if test="type != null">
+            and a.type = #{type}
+        </if>
+
+        <if test="productivityDateStart != null and productivityDateStart.length() > 0">
+            and a.productivity_date >= #{productivityDateStart}
+       </if>
+
+        <if test="productivityDateEnd != null and productivityDateEnd.length() > 0">
+            and a.productivity_date &lt;= #{productivityDateEnd}
+        </if>
+
+        <if test="expireDateStart != null and expireDateStart.length() > 0">
+            and a.expire_date >= #{expireDateStart}
+        </if>
+
+        <if test="expireDateEnd != null and expireDateEnd.length() > 0">
+            and a.expire_date &lt;= #{expireDateEnd}
+        </if>
+
+        <!--前端状态2为全部 -->
+        <if test="isProcess != null and isProcess != 2">
+            and a.is_process = #{isProcess}
+        </if>
+
+    </select>
+    <select id="queryProductDetailById" resultType="com.andy.home.po.vo.ProductVo"
+            parameterType="java.lang.Integer">
+        select
+        a.id as id,
+           a.code as code,
+           a.product_name as name,
+           a.`status` as status,
+           a.quantity as quantity,
+           a.productivity_date as productivityDate,
+           a.expire_date as expireDate,
+           b.`name` as typeName,
+           c.`name` as unitName,
+           a.type as type,
+           a.unit as unit,
+           DATEDIFF(a.expire_date,NOW()) as diffDay,
+           f.file_path as filePath,
+           a.is_process as isProcess
+          from product a
+          left join data_dictionary b on a.type = b.code
+          left join data_dictionary c on a.unit = c.code
+          left join file f on f.code = a.file_id
+        where
+        a.status = 0
+        and a.id = #{id}
+    </select>
+
+
+    <insert id="addFile" parameterType="com.andy.home.po.ProductAvatar" useGeneratedKeys="true" keyProperty="id">
+        insert into file(code,original_name,file_type,file_path,status)
+        values(#{code},#{originalName},#{fileType},#{filePath},#{status})
+    </insert>
+
+</mapper>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>andy追梦少年</title>
+
+    <link rel="stylesheet" type="text/css" href="css/main_new.css">
+
+    <script type="text/javascript">
+        const mt = 0;
+        window.onload = function () {
+            var menu = document.getElementById("menu");
+            var mt = menu.offsetTop;
+            window.onscroll = function () {
+                var t = document.documentElement.scrollTop || document.body.scrollTop;
+                if (t > mt) {
+                    menu.style.position = "fixed";
+                    menu.style.margin = "0";
+                    menu.style.top = "0";
+                }
+                else {
+                    menu.style.margin = "20px 0";
+                    menu.style.position = "static";
+                }
+            }
+
+
+        }
+
+        function f(){
+            content_frame.location.href="/home/home.do";
+        }
+
+
+        function iFrameHeight(){
+            var ifm= document.getElementById("iframepage");
+            var subWeb = document.frames ? document.frames["iframepage"].document : ifm.contentDocument;
+            if(ifm != null && subWeb != null) {
+                ifm.height = subWeb.body.scrollHeight;
+                ifm.width = subWeb.body.scrollWidth;
+                if(ifm.height <= 500){
+                    ifm.height = 500;
+                }
+
+            }
+        }
+
+    </script>
+</head>
+
+<body onload="f()">
+<div id="head" class="head">
+    <div id="head_image">
+        <img src="/images/header.gif">
+        <div id="user_nick_name">
+              <span th:text="${userInfo.nickName}"></span>
+                |  <a class="menu_login_out" href="/logout.do">退出登录</a>
+        </div>
+        <div id="user_avatar">
+            <img th:src="${userInfo.avatarUrl}">
+        </div>
+
+        <div id="menu" class="menu">
+            <ul>
+                <li><a href="/home/home.do" target="content_frame" >首页</a></li>
+                <li><a href="/product/product.do" target="content_frame">物品查询</a>
+                </li>
+                <li><a href="/user/userManage.do" target="content_frame">用户管理</a></li>
+                <li style="font-weight: bold">第三方接口管理
+                    <ul>
+                        <li><a href="/dataDictionary/dictionaryManage.do" target="content_frame">数据字典管理</a></li>
+                        <li><a href="/swagger-ui.html#" target="_blank">进入swgger接口</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!--body-->
+<div id="content">
+    <iframe src="" name="content_frame" frameborder="0" scrolling="no"
+            width="1100px" style="border: 0px;"onload="iFrameHeight()" id="iframepage">
+        1111
+    </iframe>
+</div>
+
+<!--foot-->
+<div class="foot">
+    <div class="container">
+        <div class="banquan">
+            Copyright @  All rights reserved. <a
+                href=" https://beian.miit.gov.cn" target="_blank">
+            浙ICP备2020040212号-1</a>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

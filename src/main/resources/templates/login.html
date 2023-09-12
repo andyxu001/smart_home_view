@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>andy_追梦少年</title>
+
+    <link rel="stylesheet" type="text/css" href="/css/login.css">
+    <script src="/js/jquery-1.8.3.min.js"></script>
+    <script src="/js/md5.js"></script>
+
+    <style type="text/css">
+        body{
+            background-image: url('/images/winter.gif');
+            background-size: cover;
+            opacity: 0.8;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        function login() {
+            if ($('#username').val().trim() === '') {
+                alert('用户名不能为空');
+                return false;
+            }
+            if ($('#password').val().trim() === '') {
+                alert('密码不能为空');
+                return false;
+            }
+            location.href="/toLogin.do?username="+$('#username').val()+"&password="+SparkMD5.hash($('#password').val());
+        }
+
+        function showRegister() {
+           location.href = "/user/showRegister.do";
+        }
+
+        $(function(){
+            $("input[name='password']").keypress(function(e){
+                //回车
+                if(e.keyCode == 13) {
+                    login();
+                }
+            });
+        });
+
+    </script>
+
+</head>
+
+<body>
+<div id="login">
+    <div id="login_test" th:style="${env ne 'test' ? 'display:none':''}"><h1>测试环境</h1></div>
+    <div id="login_self">
+        <table>
+            <tr>
+                <td style="text-align: right;">用户名:</td>
+                <td><input type="text" name="username" id="username"></td>
+            </tr>
+            <tr>
+                <td style="text-align: right;">密码:</td>
+                <td><input type="password" name="password" id="password"></td>
+            </tr>
+            <tr>
+                <td colspan="2" class="tr_btn">
+                    <button onclick="login()">登录</button>
+                    <button onclick="showRegister()">注册</button>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <hr>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="tr_btn">
+                    <a href="/loginByQQ.do">
+                        <img src="/images/QQ_login.png">
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>

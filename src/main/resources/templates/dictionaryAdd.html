@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.24/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.7/dayjs.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.8.3.js"></script>
+    <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+
+    <style type="text/css">
+        .form{
+            border: 1px #dddddd solid;
+            width: 60%;
+            margin-left: 50px;
+            background-color: #FFFFFF;
+        }
+
+        .form table{
+            padding-left: 190px;
+            padding-top: 10px;
+        }
+
+    </style>
+
+    <script type="text/javascript">
+        function add(){
+            if($('#dicName').val() == '') {
+                alert('请输入名称.');
+                return false;
+            }
+            if($('#dicType').val() == '') {
+                alert('请输入类型.');
+                return false;
+            }
+            $.ajax({
+                url:"/dataDictionary/dictionaryAdd.do?dicName="+$('#dicName').val()+"&dicType="+$('#dicType').val(),
+                type:"POST",
+                contentType:"application/json",
+                dataType:"json",
+                success:function(data){
+                    alert('添加成功');
+                    location.href="/dataDictionary/dictionaryManage.do";
+               },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log(textStatus, errorThrown);
+                }
+            });
+        }
+
+    </script>
+</head>
+<body>
+<div>
+    <img src="/icon/navigation.png" style="width: 16px;height: 16px" title="导航">
+    第三方接口管理><a href="/dataDictionary/dictionaryManage.do" target="content_frame" style="text-decoration: none">数据字典查询</a>
+    ><a href="/dataDictionary/dictionaryAddShow.do" target="content_frame" style="text-decoration: none">数据字典新增</a>
+</div>
+
+<div class="form">
+    <form>
+        <table style="justify-content: center;">
+            <tr>
+            <td>名称<span style="color: #FF0000;font-weight: bold">*</span>:</td>
+                <td>
+                    <input type="text" name="dicName" id="dicName">
+                </td>
+            </tr>
+            <tr>
+                <td>类型<span style="color: #FF0000;font-weight: bold">*</span>:</td>
+                <td>
+                    <select name="dicType" style="width: 100%" id="dicType">
+                        <option value="">--请选择--</option>
+                        <option th:each="p:${types}" th:value="${p.value}" th:text="${p.description}"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center">
+                    <input type="button" value="提交" onclick="add()">
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+
+</body>
+</html>

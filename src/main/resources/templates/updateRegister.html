@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>andy追梦少年</title>
+
+<link rel="stylesheet" type="text/css" href="/css/register.css">
+
+
+    <script src="js/md5.js"></script>
+    <script src="/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/js/ajaxFileupload.js"></script>
+    <script type="text/javascript" src="/js/jquery.html5uploader.js"></script>
+
+<script type="text/javascript">
+    function save(){
+        $("#nickName").css('border','1px black solid')
+
+        const sex = $("input[name='sex']:checked").val();
+        const age = $("#age").val();
+        const nickName = $("#nickName").val();
+        const telephoneNo = $("#telephoneNo").val();
+        const email = $("#email").val();
+        const id = $("#id").val();
+        if(nickName.trim() == '') {
+            alert('昵称不能为空');
+            $("#nickName").css('border','1px red solid');
+            return false;
+        }
+
+        const user = {
+            "nickName": nickName,
+            "age": age,
+            "telephoneNo": telephoneNo,
+            "email": email,
+            "sex": sex,
+            "id": id
+        };
+        //提交注册信息
+        $.ajax({
+            url:"/user/updateUserInfo.do",
+            type:"POST",
+            data:JSON.stringify(user),
+            contentType:"application/json",
+            dataType:"json",
+            success:function(data){
+                if(data) {
+                    alert('修改成功');
+                    location.href="/login.do";
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+            }
+        });
+    }
+
+    function back() {
+       location.href = "/login.do";
+    }
+
+</script>
+
+</head>
+
+<body>
+    <div>
+        <div>
+            <img src="/images/register.jpg" >
+        </div>
+        <div id="content">
+           <div id="content_register">
+               <form action="">
+                <input type="hidden" name="id" id="id" th:value="${userInfo.id}">
+                <table>
+                    <tr>
+                        <td colspan="2" style="text-align: center;"><h2>用户资料</h2></td>
+                    </tr>
+                    <tr>
+                        <td class="td_title">用户名:</td>
+                        <td><span th:text="${userInfo.userName}"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="td_title"><span style="color: red;font-weight: bold;">*</span>昵称:</td>
+                        <td><input type="text" id="nickName" name="nickName" th:value="${userInfo.nickName}"></td>
+                    </tr>
+                    <tr>
+                        <td class="td_title">年龄:</td>
+                        <td><input type="text" id="age" name="age" th:value="${userInfo.age}"></td>
+                    </tr>
+                    <tr>
+                        <td class="td_title">手机号:</td>
+                        <td><input type="text" id="telephoneNo" name="telephoneNo" th:value="${userInfo.telephoneNo}"></td>
+                    </tr>
+                    <tr>
+                        <td class="td_title">邮箱:</td>
+                        <td><input type="text" id="email" name="email" th:value="${userInfo.email}"></td>
+                    </tr>
+                    <tr>
+                        <td class="td_title">性别:</td>
+                        <td>
+                            男<input type="radio" id="male" name="sex" value="male"  th:checked="${userInfo.sex eq 'male'}" >
+                            女<input type="radio" id="female" name="sex" value="female" th:checked="${userInfo.sex eq 'female' } " >
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: center;">
+                            <input type="button" value="返回" onclick="back()"/>
+                            <input type="button" value="修改" onclick="save()"/>
+                        </td>
+                    </tr>
+                </table>
+               </form>
+           </div>
+        </div>
+    </div>
+</body>
+</html>

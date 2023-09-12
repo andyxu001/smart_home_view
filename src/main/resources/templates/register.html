@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>andy追梦少年</title>
+
+<link rel="stylesheet" type="text/css" href="/css/register.css">
+
+
+    <script src="js/md5.js"></script>
+    <script src="/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/js/ajaxFileupload.js"></script>
+    <script type="text/javascript" src="/js/jquery.html5uploader.js"></script>
+
+<script type="text/javascript">
+
+    function fileUpload(){
+        $.ajaxFileUpload({
+            url:"/product/uploadFile.do",
+            type:"POST",
+            fileElementId:'avatar',
+            contentType:"application/json",
+            dataType:"json",
+            success:function(data){
+                $('#avatarUrl').val(data);
+            },
+            error:function (e) {
+                alert(e);
+            }
+        });
+    }
+
+    function checkAccount() {
+        const userName = $('#userName').val().trim();
+        $.ajax({
+            url:"/user/checkAccount.do?userName="+userName,
+            type:"POST",
+            contentType:"application/json",
+            success:function(data){
+                if(data) {
+                    alert('该用户名已被注册');
+                    $("#userName").css('border','1px red solid');
+                } else{
+                    $("#userName").css('border','1px black solid');
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+            }
+        });
+    }
+
+    function save(){
+        const pwd = $('#password').val();
+        //alert(SparkMD5.hash(pwd));
+        $("#userName").css('border','1px black solid')
+        $("#password").css('border','1px black solid')
+        $("#passwordConfirm").css('border','1px black solid')
+        $("#nickName").css('border','1px black solid')
+        const userName = $("#userName").val();
+        const password = $("#password").val();
+        const passwordConfirm = $("#passwordConfirm").val();
+        const nickName = $("#nickName").val();
+
+        const sex = $("input[name='sex']:checked").val();
+        const age = $("#age").val();
+        const telephoneNo = $("#telephoneNo").val();
+        const email = $("#email").val();
+        const avatarId = $("#nickName").val();
+        if(userName.trim() == '') {
+            alert('用户名不能为空');
+            $("#userName").css('border','1px red solid');
+            return false;
+        }
+        if(nickName.trim() == '') {
+            alert('昵称不能为空');
+            $("#nickName").css('border','1px red solid');
+            return false;
+        }
+        if(password.trim() == '') {
+            alert('密码不能为空');
+            $("#password").css('border','1px red solid');
+            return false;
+        }
+        if(passwordConfirm.trim() == '') {
+            alert('确认密码不能为空');
+            $("#passwordConfirm").css('border','1px red solid');
+            return false;
+        }
+        if(passwordConfirm.trim() != password.trim()) {
+            alert('确认密码和密码不一致,请确认');
+            $("#passwordConfirm").css('border','1px red solid');
+            return false;
+        }
+        if(sex == '') {
+            alert('请选择性别');
+            return false;
+        }
+        //再次检查密码的复杂度
+        checkpwd(password.trim());
+
+        $.ajax({
+            url:"/user/checkAccount.do?userName="+userName,
+            type:"POST",
+            contentType:"application/json",
+            success:function(data){
+                if(data) {
+                    alert('该用户名已被注册');
+                    $("#userName").css('border','1px red solid');
+                } else{
+
+                    const user = {
+                        "userName": $('#userName').val(),
+                        "password": SparkMD5.hash($('#password').val()),
+                        "nickName": $('#nickName').val(),
+                        "age": $('#age').val(),
+                        "telephoneNo": $('#telephoneNo').val(),
+                        "email": $('#email').val(),
+                        "sex": sex,
+                        "avatarId": $('#avatarUrl').val()
+                    };
+                    //提交注册信息
+                    $.ajax({
+                        url:"/user/toRegister.do",
+                        type:"POST",
+                        data:JSON.stringify(user),
+                        contentType:"application/json",
+                        dataType:"json",
+                        success:function(data){
+                            if(data) {
+                                alert('注册成功');
+                                location.href="/login.do";
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.log(textStatus, errorThrown);
+                        }
+                    });
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+            }
+        });
+    }
+
+    function back() {
+       location.href = "/login.do";
+    }
+
+    function checkpwd(obj) {
+        const regex = new RegExp('(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^a-zA-Z0-9]).{8,30}');
+        if (!regex.test(obj)) {
+            alert("您的密码复杂度太低（密码中必须包含字母、数字、特殊字符且不少于8个字符），请及时改密码！");
+            return false;
+        }
+    }
+</script>
+
+</head>
+
+<body>
+    <div>
+        <div>
+            <img src="/images/register.jpg" >
+        </div>
+        <div id="content">
+           <div id="content_register">
+               <form action="" enctype="multipart/form-data">
+                <table>
+                    <tr>
+                        <td colspan="2" style="text-align: center;"><h2>用户注册</h2></td>
+                    </tr>
+                    <tr>
+                        <td class="td_title"><span style="color: red;font-weight: bold;">*</span>用户名:</td>
+                        <td><input type="text" id="userName" name="userName" onblur="checkAccount()"></td>
+                    </tr>
+                    <tr>
+                        <td class="td_title"><span style="color: red;font-weight: bold;">*</span>昵称:</td>
+                        <td><input type="text" id="nickName" name="nickName"></td>
+                    </tr>
+                    <tr>
+                        <td class="td_title"><span style="color: red;font-weight: bold;">*</span>密码:</td>
+                        <td><input type="password" id="password" name="password" onblur="checkpwd(this.value)"></td>
+                    </tr>
+                    <tr>
+                        <td class="td_title"><span style="color: red;font-weight: bold;">*</span>确认密码:</td>
+                        <td><input type="password" id="passwordConfirm" name="passwordConfirm"></td>
+                    </tr>
+                    <tr>
+                        <td class="td_title">年龄:</td>
+                        <td><input type="text" id="age" name="age"></td>
+                    </tr>
+                    <tr>
+                        <td class="td_title">手机号:</td>
+                        <td><input type="text" id="telephoneNo" name="telephoneNo"></td>
+                    </tr>
+                    <tr>
+                        <td class="td_title">邮箱:</td>
+                        <td><input type="text" id="email" name="email"></td>
+                    </tr>
+                    <tr>
+                        <td class="td_title">性别:</td>
+                        <td>
+                            男<input type="radio" id="male" name="sex" value="male" checked >
+                            女<input type="radio" id="female" name="sex" value="female">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_title">头像:</td>
+                        <td>
+                            <input type="hidden" name="avatarUrl" id="avatarUrl" value="0">
+                            <input type="file" id="avatar" name="avatar" onchange="fileUpload()">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: center;">
+                            <input type="button" value="返回" onclick="back()"/>
+                            <input type="button" value="提交" onclick="save()"/>
+                        </td>
+                    </tr>
+                </table>
+               </form>
+           </div>
+        </div>
+    </div>
+</body>
+</html>

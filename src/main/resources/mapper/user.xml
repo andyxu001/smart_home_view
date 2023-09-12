@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.andy.home.mapper.UserMapper">
+
+     <resultMap id="dataDictionaryMap" type="com.andy.home.po.User">
+         <id property="id" column="id" />
+         <result property="userName" column="user_name"/>
+         <result property="password" column="password" />
+         <result property="nickName" column="nick_name" />
+         <result property="status" column="status"/>
+         <result property="age" column="age"/>
+         <result property="telephoneNo" column="telephone_no"/>
+         <result property="email" column="email"/>
+         <result property="sex" column="sex"/>
+         <result property="avatarId" column="avatar_Id"/>
+         <result property="avatarUrl" column="avatar_url"/>
+         <result property="isNormalUser" column="is_normal_user"/>
+         <result property="isQQUser" column="is_qq_user"/>
+         <result property="isWechatUser" column="is_wechat_user"/>
+     </resultMap>
+
+    <insert id="toRegister" parameterType="com.andy.home.po.User" useGeneratedKeys="true" keyProperty="id">
+        insert into user(user_name,password,nick_name,status,age,telephone_no,email,sex,avatar_Id,avatar_url,is_normal_user,is_qq_user,
+        is_wechat_user)
+        values(#{userName},#{password},#{nickName},0,#{age},#{telephoneNo},#{email},#{sex},#{avatarId},
+        #{avatarUrl},#{isNormalUser},#{isQQUser},#{isWechatUser})
+    </insert>
+
+    <insert id="addLoginHistory" parameterType="com.andy.home.po.LoginHistory">
+        insert into login_history(user_id,nick_name,ip,op_type,op_time)
+        values(#{userId},#{nickName},#{ip},#{opType},now())
+    </insert>
+
+    <update id="updateUserInfo" parameterType="com.andy.home.po.User">
+        update user set
+        nick_name = #{nickName},
+        sex = #{sex},
+        age = #{age},
+        telephone_no = #{telephoneNo},
+        email = #{email}
+        where id = #{id}
+    </update>
+
+    <select id="checkAccount" parameterType="string" resultType="integer">
+        select count(1) from user where user_name = #{userName}
+    </select>
+
+    <select id="getUserInfo" parameterType="string" resultType="com.andy.home.po.User">
+         select
+         a.id as id,
+         a.user_name as userName,
+         a.password as password,
+         a.nick_name as nickName,
+         a.sex as sex,
+         a.age as age,
+         a.telephone_no as telephoneNo,
+         a.email as email,
+         if(a.is_normal_user = 'Y',b.file_path,a.avatar_url) as avatarUrl,
+         a.is_normal_user as isNormalUser,
+         a.is_qq_user as isQQUser,
+         a.is_wechat_user as isWechatUser
+         from user a
+         left join file b on a.avatar_id = b.code
+         where a.status = 0
+         and user_name = #{username}
+    </select>
+
+
+</mapper>

@@ -1,0 +1,37 @@
+
+#login{
+    position: relative;
+}
+
+#login_self{
+    width: 300px;
+    height: 200px;
+    position: absolute;
+    top: 250px;
+    left: 650px;
+    border: 1px #ddd solid;
+}
+
+#login_test{
+    width: 300px;
+    height: 100px;
+    position: absolute;
+    top: 100px;
+    left: 650px;
+}
+
+#login_test h1{
+    font-size: 25px;
+    color: red;
+    font-weight: bold;
+    padding: 100px;
+}
+
+#login_self table{
+    margin: 30px auto;
+}
+
+.tr_btn{
+    text-align: center;
+
+}

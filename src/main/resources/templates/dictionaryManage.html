@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.24/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.7/dayjs.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.8.3.js"></script>
+    <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+
+    <style type="text/css">
+        .contain{
+            width: 70%;
+            margin: 30px 50px;
+            border: black 0px solid;
+        }
+
+        .div_search{
+            float: left;
+            width: 450px;
+            border: red 0px solid;
+        }
+
+        .div_add{
+            border: red 0px solid;
+            float: left;
+        }
+
+        .div_table_page{
+            float: left;
+            width: 500px;
+        }
+
+        .div_table{
+            float: left;
+            width: 500px;
+            border: #dddddd 1px solid;
+            margin-top: 10px;
+            background-color: #FFFFFF;
+        }
+
+        .dic-table{
+            width: 100%;
+        }
+
+        .dic_tr{
+            background-color: #87CEEB;
+        }
+
+        tbody tr td{
+            text-align: center;
+            border: #dddddd 1px solid;
+        }
+
+        .btn{
+            background-color: aqua;
+        }
+
+    </style>
+
+    <script type="text/javascript">
+
+        function search() {
+           $('#form').submit();
+        }
+
+        function showDialog(){
+            location.href="/dataDictionary/dictionaryAddShow.do";
+        }
+
+        function reUseOrCancel(id,status) {
+            var op = status == -1?"作废":"启用";
+            if(confirm("确定要"+op)) {
+                $.ajax({
+                    url:"/dataDictionary/reUseOrCancel.do?id="+id+"&status="+status,
+                    type:"POST",
+                    contentType:"application/json",
+                    dataType:"json",
+                    success:function(data){
+                        alert(op+'成功');
+                        location.href="/dataDictionary/dictionaryManage.do?dicType="+$('#dicType').val();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log(textStatus, errorThrown);
+                        alert(op+'失败')
+                    }
+                });
+            }
+        }
+
+        function synDataToRedisByMysql() {
+            if(confirm("确定要将mysql数据同步到redis?")) {
+                $.ajax({
+                    url:"/dataDictionary/synDataToRedisByMysql.do",
+                    type:"POST",
+                    contentType:"application/json",
+                    dataType:"json",
+                    success:function(data){
+                        alert('同步成功');
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log(textStatus, errorThrown);
+                        alert(op+'同步失败');
+                    }
+                });
+            }
+        }
+
+    </script>
+</head>
+<body>
+<div>
+    <img src="/icon/navigation.png" style="width: 16px;height: 16px" title="导航">
+    第三方接口管理><a href="/dataDictionary/dictionaryManage.do" target="content_frame" style="text-decoration: none">数据字典查询</a>
+</div>
+
+  <div class="contain">
+      <div class="div_search" style="width: 45%;" >
+          <form action="/dataDictionary/dictionaryManage.do" id="form">
+              数据类型:<select name="dicType" id="dicType">
+              <option value="product_type" th:selected="${dicType == 'product_type'}">类别</option>
+              <option value="unit_type" th:selected="${dicType == 'unit_type'}">单位</option>
+          </select>
+           <input type="button" value="查询" onclick="search()" class="btn"><br>
+          </form>
+      </div>
+
+      <div class="div_add">
+          <input type="button" class="btn" value="一键同步Redis" onclick="synDataToRedisByMysql()"/>&nbsp;&nbsp;
+          <input type="button" class="btn" value="新增" onclick="showDialog()"/>
+      </div>
+
+    <div class="div_table_page">
+      <div class="div_table">
+         <table class="dic-table">
+           <thead class="dic_tr">
+              <th>序号</th>
+              <th>编号</th>
+              <th>名称</th>
+              <th>状态</th>
+              <th>操作</th>
+           </thead>
+
+             <tbody>
+               <tr th:each="p,loopStatus:${pageInfo.list}">
+                 <td th:text="${loopStatus.count}"></td>
+                 <td th:text="${p.code}"></td>
+                 <td th:text="${p.name}"></td>
+                 <td th:switch="${p.status}">
+                     <span th:case="0" style="background-color:#00ff66;font-weight: bold;border-radius: 4px">正常</span>
+                     <span th:case="-1" style="background-color: #b81900;font-weight: bold;border-radius: 4px">作废</span>
+                 <td>
+                    <input id="div"+${p.id} type="hidden" value=${p.id}>
+                     <input type="button" class="btn" value="作废" th:onclick="'javascript:reUseOrCancel(\''+${p.id}+'\',-1);'" th:if="${p.status == 0}" >
+                     <input type="button" class="btn"  value="启用" th:onclick="'javascript:reUseOrCancel(\''+${p.id}+'\',0);'" th:if="${p.status == -1}" >
+                </td>
+               </tr>
+             </tbody>
+         </table>
+      </div>
+
+
+    </div>
+  </div>
+</body>
+</html>

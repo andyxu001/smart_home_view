@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!--<script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.24/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.11.7/dayjs.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.8.3.js"></script>
+    <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>-->
+
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>-->
+
+    <link href="/css/jquery.datetimepicker.min.css" rel="stylesheet" type="text/css">
+    <script src="/js/jquery-1.8.3.min.js"></script>
+    <script src="/js/jquery.datetimepicker.full.min.js"></script>
+
+    <style type="text/css">
+        .contain{
+            width: 95%;
+            margin: 30px 50px;
+            border: black 0px solid;
+        }
+
+        .div_search{
+            float: left;
+            width: 100%;
+            border: red 0px solid;
+        }
+
+       /* .div_add{
+            border: red 0px solid;
+            float: left;
+            padding-left: 20px;
+        }*/
+
+        .div_add{
+            margin-top: 5px;
+        }
+
+        .div_table_page{
+            float: left;
+            width: 1000px;
+        }
+
+        .div_table{
+            float: left;
+            width: 100%;
+            border: #dddddd 1px solid;
+            margin-top: 5px;
+            background-color: #FFFFFF;
+        }
+
+        .dic-table{
+            width: 100%;
+        }
+
+        .dic_tr{
+            background-color: #87CEEB;
+        }
+
+        .data_tr tr td{
+            text-align: center;
+            border: #dddddd 1px solid;
+        }
+
+        .div_page{
+            float: right;
+            height: 100px;
+            line-height: 30px;
+            margin-right: 50px;
+            margin-top: 15px;
+        }
+
+        .btn{
+            background-color: aqua;
+        }
+
+        .s_td_title{
+            text-align: right;
+        }
+
+        <!--分页中数据 -->
+        .page_size{
+            color: #FF0000;
+            font-weight: bold;
+        }
+
+        a{
+            text-decoration: none;
+        }
+
+        a:hover{
+            color: #FF0000;
+        }
+
+    </style>
+
+    <script type="text/javascript">
+
+        $(function(){
+            $.datetimepicker.setLocale('zh');
+            $('#p_beginDate').datetimepicker({
+                timepicker: false,
+                format: 'Y-m-d'
+            });
+            $('#p_endDate').datetimepicker({
+                timepicker: false,
+                format: 'Y-m-d'
+            });
+            $('#e_beginDate').datetimepicker({
+                timepicker: false,
+                format: 'Y-m-d'
+            });
+            $('#e_endDate').datetimepicker({
+                timepicker: false,
+                format: 'Y-m-d'
+            });
+        });
+
+        function search() {
+            $('#pageNum').val(1);
+            $('#form').submit();
+        }
+
+        function jump() {
+            const i = $('#search_pageNum').val();
+            location.href = "/product/product.do?pageNum="+i;
+        }
+
+        function showDialog(){
+            location.href="/product/productAddShow.do";
+        }
+
+        function viewProduct(id) {
+            location.href="/product/productDetail.do?id="+id;
+        }
+
+        function updateProduct(id){
+            location.href = "/product/productUpdateShow.do?id="+id;
+        }
+
+        //删除物品前先检查
+        function delProduct(id) {
+            if(confirm("确定要删除吗?")) {
+                $.ajax({
+                    url: "/product/getProductProcessStatus.do?id=" + id,
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data == -1) {
+                            $.ajax({
+                                url: "/product/delProduct.do?id=" + id,
+                                type: "POST",
+                                contentType: "application/json",
+                                dataType: "json",
+                                success: function (data) {
+                                    alert('删除成功');
+                                    location.href = "/product/product.do";
+                                },
+                                error: function (jqXHR, textStatus, errorThrown) {
+                                    console.log(textStatus, errorThrown);
+                                    alert( '删除失败')
+                                }
+                            });
+                        } else {
+                            alert('该物品还未处理，不能删除');
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(textStatus, errorThrown);
+                        alert( '删除失败')
+                    }
+                });
+
+            }
+        }
+
+        /**
+         * 是否处理
+         * @param id
+         */
+        function processProduct(id) {
+            if(confirm("确定要处理吗?")){
+                    $.ajax({
+                        url: "/product/processProduct.do?id=" + id,
+                        type: "POST",
+                        contentType: "application/json",
+                        dataType: "json",
+                        success: function (data) {
+                            alert('处理成功');
+                            location.href = "/product/product.do";
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log(textStatus, errorThrown);
+                            alert( '处理失败');
+                        }
+                    });
+           }
+        }
+
+
+
+    </script>
+</head>
+<body>
+<div>
+    <img src="/icon/navigation.png" style="width: 16px;height: 16px" title="导航">
+    <a href="/product/product.do" target="content_frame" style="text-decoration: none">物品查询</a>
+</div>
+
+<div class="contain">
+    <div class="div_search">
+        <form action="/product/product.do" id="form">
+            <input type="hidden" id="pageNum" name="pageNum" value="1"/>
+            <table>
+                <tr>
+                    <td class="s_td_title">生产日:</td>
+                    <td>
+                        <input type="text" th:value="${productDto.productivityDateStart}"  name="productivityDateStart" id="p_beginDate" style="width: 80px">~
+                        <input type="text" th:value="${productDto.productivityDateEnd}" name="productivityDateEnd" id="p_endDate" style="width: 80px">
+                    </td>
+                    <td class="s_td_title">所属类型:</td>
+                    <td>
+                        <select name="type">
+                           <option value="">请选择</option>
+                            <option th:selected="${productDto.type == p.code}" th:each="p:${productTypes}" th:value="${p.code}" th:text="${p.name}"></option>
+                         </select>
+                    </td>
+                    <td class="s_td_title">状态:</td>
+                    <td>
+                        <select name="status" style="width: 100%">
+                            <option value="">全部</option>
+                            <option value="0" th:selected="${productDto.status == 0}">正常</option>
+                            <option value="-1" th:selected="${productDto.status == -1}">已过期</option>
+                        </select>
+                    </td>
+                    <td class="s_td_title">处理状态:</td>
+                    <td>
+                        <select name="isProcess" style="width: 100%">
+                            <option value="2">全部</option>
+                            <option value="0" th:selected="${productDto.isProcess == 0}">正常</option>
+                            <option value="-1" th:selected="${productDto.isProcess == -1}">已处理</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="s_td_title">过期日:</td>
+                    <td>
+                        <input type="text" th:value="${productDto.expireDateStart}"  name="expireDateStart" id="e_beginDate" style="width: 80px">~
+                        <input type="text" th:value="${productDto.expireDateEnd}" name="expireDateEnd" id="e_endDate" style="width: 80px">
+                    </td>
+                    <td class="s_td_title">距过期剩余天数:</td>
+                    <td>
+                        <select name="diffDay">
+                            <option value="">全部</option>
+                            <option value="3" th:selected="${productDto.diffDay == 3}">3天内</option>
+                            <option value="7" th:selected="${productDto.diffDay == 7}">1周内</option>
+                            <option value="30" th:selected="${productDto.diffDay == 30}">1个月内</option>
+                            <option value="365" th:selected="${productDto.diffDay == 365}">1年内</option>
+                        </select>
+                    </td>
+                    <td class="s_td_title">名称:</td>
+                    <td>
+                        <input type="text" name="name" th:value="${productDto.name}"/>
+                    </td>
+                    <td style="text-align: center">
+                        <input type="button" value="查询" onclick="search('1')" class="btn">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+
+    <div class="div_table_page">
+        <div class="div_add">
+            <input type="button" class="btn" value="新增" onclick="showDialog()"></input>
+        </div>
+        <div class="div_table">
+            <table class="dic-table">
+                <thead class="dic_tr">
+                <th>序号</th>
+                <th>名称</th>
+                <th>数量</th>
+                <th>单位</th>
+                <th>生产日</th>
+                <th>过期日</th>
+                <th>距过期剩余天数</th>
+                <th>状态</th>
+                <th>所属类别</th>
+                <th>处理状态</th>
+                <th>操作</th>
+                </thead>
+
+                <tbody class="data_tr">
+                <tr th:each="p,loopStatus:${listPageInfo.list}">
+                    <td th:text="${loopStatus.count}"></td>
+                    <td th:text="${p.name}"></td>
+                    <td th:text="${p.quantity}"></td>
+                    <td th:text="${p.unitName}"></td>
+                    <td th:text="${p.productivityDate}"></td>
+                    <td th:text="${p.expireDate}"></td>
+                    <td th:text="${p.diffDay}"></td>
+                    <td>
+                        <span style="background-color:#00ff66;font-weight: bold;border-radius: 4px" th:if="${p.diffDay >= 0}">正常</span>
+                        <span style="background-color:#FF0000;font-weight: bold;border-radius: 4px" th:if="${p.diffDay < 0}">已过期</span>
+                    </td>
+                    <td th:text="${p.typeName}"></td>
+                    <td>
+                        <span style="font-weight: bold;" th:if="${p.isProcess == 0}">正常</span>
+                        <span style="font-weight: bold;" th:if="${p.isProcess < 0}">已处理</span>
+                    </td>
+                    <td>
+                        <input type="button" class="btn" value="查看详情" th:onclick="'javascript:viewProduct(\''+${p.id}+'\');'" >&nbsp;
+                        <input type="button" class="btn" value="删除" th:onclick="'javascript:delProduct(\''+${p.id}+'\');'" >&nbsp;
+                        <input type="button" class="btn" value="修改" th:onclick="'javascript:updateProduct(\''+${p.id}+'\');'" >
+
+                        <input type="button" class="btn" value="处理" th:if="${p.isProcess < 0}" disabled style="background-color: #dddddd" th:onclick="'javascript:processProduct(\''+${p.id}+'\');'" >&nbsp;
+                        <input type="button" class="btn" value="处理" th:if="${p.isProcess >= 0}" th:onclick="'javascript:processProduct(\''+${p.id}+'\');'" >&nbsp;
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="div_page">
+            共<span class="page_size" style="font-weight: bold;color: #FF0000" th:text="${listPageInfo.total}"></span>条记录&nbsp;&nbsp;
+            <span class="page_size" style="font-weight: bold;color: #FF0000" th:text="${listPageInfo.pageNum}"></span>&nbsp;/&nbsp;
+            <span class="page_size" style="font-weight: bold;color: #FF0000" th:text="${listPageInfo.pages}"></span>页&nbsp;每页显示<span class="page_size" style="font-weight: bold;color: #FF0000" th:text="${listPageInfo.pageSize}"></span>条&nbsp;
+
+            <a href="/product/product.do?pageNum=1">首页</a>&nbsp;&nbsp;<span style="font-weight: bold;">|&nbsp;&nbsp;</span>
+
+            <span th:switch="${listPageInfo.hasPreviousPage}">
+              <span th:case="true"><a th:href="@{'/product/product.do?pageNum='+${listPageInfo.pageNum - 1}}">上一页&nbsp;&nbsp;<span style="font-weight: bold;">|</span>&nbsp;&nbsp;</a></span>
+              <span th:case="false">上一页&nbsp;&nbsp;<span style="font-weight: bold;">|</span>&nbsp;&nbsp;</span>
+            </span>
+
+            <span th:switch="${listPageInfo.hasNextPage}">
+              <span th:case="true"><a th:href="@{'/product/product.do?pageNum='+${listPageInfo.pageNum + 1}}">下一页&nbsp;&nbsp;<span style="font-weight: bold;">|</span>&nbsp;&nbsp;</a></span>
+              <span th:case="false">下一页&nbsp;&nbsp;<span style="font-weight: bold;">|</span>&nbsp;&nbsp;</span>
+            </span>
+
+            <a th:href="@{'/product/product.do?pageNum='+${listPageInfo.pages}}">末页</a>&nbsp;&nbsp;&nbsp;
+            跳到第<input type="text" style="width: 30px" id="search_pageNum"/>页<button th:onclick="'javascript:jump();'">Go</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
