@@ -35,10 +35,10 @@ public class ProductJob implements Job {
     @Value("${spring.profiles.active}")
     public String env;
 
-    private final String APP_ID = "wx5e6a50c063cc2ec2";
-    //private final String OPEN_ID_XIAOFEI = "oBDDc6fJoK9_p2ckaXv-lkOZTomY"; //小飞的微信测试账号
-    //private final String OPEN_ID_XIAOKANG = "oBDDc6XwE_SoXuX-WUECSenn3zlw";
-    private final String APP_SECRET = "a828fd8bc654dc97ecbbce8ee44314d1";
+    private final String APP_ID = "*******";
+    //private final String OPEN_ID_XIAOFEI = "******"; //小飞的微信测试账号
+    //private final String OPEN_ID_XIAOKANG = "********";
+    private final String APP_SECRET = "*******";
     private final String GRANT_TYPE = "client_credential";
     private final String TEMPLATE_ID = "Ei7g4YMogYoWR29J4AGBa8G7sxTjBohdKAhO4FRjU1o";
     private final String URL = "https://api.weixin.qq.com/cgi-bin/token?" +
